@@ -20,7 +20,7 @@ Hệ thống bao gồm 3 dịch vụ chính hoạt động độc lập:
 * **Architecture:** Microservices
 * **Microservices:** Spring Cloud Gateway
 * **Build Tool:** Maven (hoặc Gradle)
-* * **Database:** (PostgreSQL)
+* **Database:** (PostgreSQL)
 * **Containerization:** Docker & Docker Compose
 
 ---
