@@ -33,20 +33,24 @@ Bạn có thể chọn 1 trong 2 cách để chạy dự án: **Chạy thủ cô
 
 Yêu cầu máy đã cài Java và Maven. Mở 3 terminal khác nhau và chạy lần lượt:
 
-**1. User Service**
+**1. User Service** 
 ```bash
 cd user-service
 ./mvnw spring-boot:run
 # Server started at http://localhost:8082
+```
+
 
 **2. Post Service**
 ```bash
 cd post-service
 ./mvnw spring-boot:run
 # Server started at http://localhost:8083
+```
 
 **3. API Gateway**
 ```bash
 cd api-gateway
 ./mvnw spring-boot:run
 # Server started at http://localhost:8081
+```
