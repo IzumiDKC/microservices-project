@@ -27,4 +27,11 @@ public class PostController {
     public ResponseEntity<List<Post>> getFeed(@RequestParam Long userId) {
         return ResponseEntity.ok(postService.getFeed(userId));
     }
+
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<String> likePost(@PathVariable Long postId, @RequestParam Long userId) {
+        // Hứng chuỗi kết quả từ Service (Like Success hoặc Unlike Success)
+        String result = postService.toggleLike(userId, postId);
+        return ResponseEntity.ok(result);
+    }
 }
