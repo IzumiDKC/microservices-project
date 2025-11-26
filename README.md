@@ -54,3 +54,11 @@ cd api-gateway
 ./mvnw spring-boot:run
 # Server started at http://localhost:8081
 ```
+
+## Đóng góp (Contributing)
+
+* Fork repository này.
+* Tạo branch mới (git checkout -b feature/ten-tinh-nang).
+* Commit thay đổi (git commit -m 'Thêm tính năng X').
+* Push lên branch (git push origin feature/ten-tinh-nang).
+* Tạo Pull Request.
