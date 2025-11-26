@@ -16,9 +16,11 @@ Hệ thống bao gồm 3 dịch vụ chính hoạt động độc lập:
 
 ## 🛠 Công nghệ sử dụng
 
-* **Core:** Java 17+, Spring Boot
+* **Core:** Java 21, Spring Boot
+* **Architecture:** Microservices
 * **Microservices:** Spring Cloud Gateway
 * **Build Tool:** Maven (hoặc Gradle)
+* * **Database:** (PostgreSQL)
 * **Containerization:** Docker & Docker Compose
 
 ---
