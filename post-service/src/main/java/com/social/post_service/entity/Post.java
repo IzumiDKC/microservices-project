@@ -19,7 +19,6 @@ public class Post {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    // --- Constructor ---
     public Post() {}
 
     public Post(Long id, String content, String imageUrl, Long userId, LocalDateTime createdAt) {
