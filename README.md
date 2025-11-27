@@ -1,4 +1,4 @@
-# 🚀 Microservices Project
+# Microservices Project
 
 Dự án backend theo kiến trúc Microservices, bao gồm quản lý User và Post, được điều phối bởi API Gateway.
 
