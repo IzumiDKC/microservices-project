@@ -1,6 +1,7 @@
 package com.social.user_service.controller;
 
 import com.social.user_service.entity.AppUser;
+import com.social.user_service.repository.AppUserRepository;
 import com.social.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +32,11 @@ public class UserController {
     @GetMapping("/{userId}/following-ids")
     public ResponseEntity<List<Long>> getFollowingIds(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getFollowingIds(userId));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Long> getUserIdByUsername(@RequestParam String username) {
+        Long userId = userService.getUserIdByUsername(username);
+        return ResponseEntity.ok(userId);
     }
 }

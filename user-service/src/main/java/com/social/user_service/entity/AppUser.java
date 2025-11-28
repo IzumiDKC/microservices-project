@@ -27,4 +27,19 @@ public class AppUser {
     public String getUsername() { return username; }
     public String getFullName() { return fullName; }
     public String getAvatarUrl() { return avatarUrl; }
+
+    public void setId(Long id) { this.id = id; }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
 }

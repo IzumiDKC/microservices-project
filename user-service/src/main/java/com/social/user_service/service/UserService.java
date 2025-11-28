@@ -24,9 +24,6 @@ public class UserService {
     // Follow user khác
     public void follow(Long followerId, Long followingId) {
         if (!followRepo.existsByFollowerIdAndFollowingId(followerId, followingId)) {
-            // CŨ (Lỗi): followRepo.save(Follow.builder().followerId(...).build());
-
-            // MỚI (Chuẩn Java): Dùng Constructor thủ công
             // Tham số đầu tiên là ID (để null vì nó tự tăng), sau đó là followerId, followingId
             Follow newFollow = new Follow(null, followerId, followingId);
             followRepo.save(newFollow);
@@ -36,5 +33,22 @@ public class UserService {
     public List<Long> getFollowingIds(Long userId) {
         List<Follow> follows = followRepo.findByFollowerId(userId);
         return follows.stream().map(Follow::getFollowingId).collect(Collectors.toList());
+    }
+
+    public Long getUserIdByUsername(String username) {
+        // Tìm trong DB xem có user này chưa
+        java.util.Optional<AppUser> userOptional = userRepo.findByUsername(username);
+
+        if (userOptional.isPresent()) {
+            return userOptional.get().getId();
+        } else {
+            // 2. Chưa có (Lần đầu đăng nhập bằng Keycloak) -> TỰ ĐỘNG TẠO MỚI
+            AppUser newUser = new AppUser();
+            newUser.setUsername(username);
+            newUser.setFullName(username); // Lấy username làm tên hiển thị
+
+            AppUser savedUser = userRepo.save(newUser);
+            return savedUser.getId();
+        }
     }
 }

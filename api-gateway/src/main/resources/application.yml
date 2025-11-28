@@ -9,7 +9,7 @@ spring:
       discovery:
         locator:
           enabled: true
-          lower-case-service-id: true # Chuy?n tên service thành ch? th??ng
+          lower-case-service-id: true
       routes:
         # --- Route User Service ---
         - id: user-service
@@ -22,7 +22,12 @@ spring:
           uri: lb://POST-SERVICE
           predicates:
             - Path=/api/posts/**, /api/feed/**
-
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # issuer-uri: http://localhost:9090/realms/social-network
+          jwk-set-uri: http://localhost:9090/realms/social-network/protocol/openid-connect/certs
 eureka:
   client:
     service-url:

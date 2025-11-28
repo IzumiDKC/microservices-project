@@ -24,6 +24,9 @@ services:
       KC_DB_PASSWORD: password
       KEYCLOAK_ADMIN: admin       # User đăng nhập trang quản trị
       KEYCLOAK_ADMIN_PASSWORD: admin # Pass đăng nhập trang quản trị
+
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_STRICT: false
     ports:
       - "9090:8080" # Map ra port 9090
     depends_on:
