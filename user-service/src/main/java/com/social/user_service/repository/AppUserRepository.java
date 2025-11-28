@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
-    // Có thể thêm hàm tìm theo username nếu cần login sau này
-    // Optional<AppUser> findByUsername(String username);
+    java.util.Optional<AppUser> findByUsername(String username);
 }

@@ -22,25 +22,25 @@ public class PostService {
         this.postLikeRepo = postLikeRepo;
     }
 
-    public Post createPost(Post post) {
+    public Post createPost(Post post, String username) {
+        // Gọi User Service để lấy ID từ database
+        Long userId = userClient.getUserIdByUsername(username);
+        // Gán ID vào bài viết
+        post.setUserId(userId);
         return postRepo.save(post);
     }
-
     public List<Post> getFeed(Long currentUserId) {
-        // 1. Hỏi User Service: "User này đang follow ai?"
+        // Hỏi User Service: "User này đang follow ai?"
         List<Long> followingIds = userClient.getFollowingIds(currentUserId);
-
-        // 2. Thêm chính mình vào (để thấy bài của mình luôn)
+        // Thêm chính mình vào để thấy bài của mình
         followingIds.add(currentUserId);
-
-        // 3. Query bài viết
+        // Query bài viết
         return postRepo.findByUserIdInOrderByCreatedAtDesc(followingIds);
     }
 
     public String toggleLike(Long userId, Long postId) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
-
         if (postLikeRepo.existsByPostIdAndUserId(postId, userId)) {
             // Đang like -> Xóa -> Trả về Unlike Success
             PostLike like = postLikeRepo.findByPostIdAndUserId(postId, userId);
