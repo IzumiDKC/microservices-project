@@ -12,6 +12,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/reports/**").permitAll()
                         .anyRequest().authenticated() // Tất cả API đều cần Token
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {})); // đọc JWT

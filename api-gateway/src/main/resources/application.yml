@@ -21,7 +21,7 @@ spring:
         - id: post-service
           uri: lb://POST-SERVICE
           predicates:
-            - Path=/api/posts/**, /api/feed/**
+            - Path=/api/posts/**, /api/feed/**, /api/reports/**
   security:
     oauth2:
       resourceserver:
