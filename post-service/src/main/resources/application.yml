@@ -21,6 +21,19 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:9090/realms/social-network/protocol/openid-connect/certs
+  camunda:
+    bpm:
+      admin-user:
+        id: admin
+        password: admin
+        firstName: Admin
+      filter:
+        create: All
+      database:
+        schema-update: true
+  cloud:
+    compatibility-verifier:
+      enabled: false
 eureka:
   instance:
     prefer-ip-address: true # <--- IP 127.0.0.1
