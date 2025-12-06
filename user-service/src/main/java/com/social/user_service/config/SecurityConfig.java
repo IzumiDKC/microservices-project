@@ -14,6 +14,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Cho phép tải báo cáo user tự do
                         .requestMatchers("/api/users/report/**").permitAll()
+                        .requestMatchers("/api/users/search").permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();
