@@ -13,8 +13,22 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 public class SecurityConfig {
 
-    // --- CHAIN 1: CẤU HÌNH RIÊNG  CAMUNDA (Ưu tiên chạy trước)
     @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/reports/**").permitAll()
+                        .anyRequest().authenticated() // Tất cả API đều cần Token
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {})); // đọc JWT
+        return http.build();
+    }
+
+
+    // --- CHAIN 1: CẤU HÌNH RIÊNG  CAMUNDA (Ưu tiên chạy trước)
+    /* @Bean
     @Order(1)
     public SecurityFilterChain camundaSecurityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -57,4 +71,5 @@ public class SecurityConfig {
 
         return http.build();
     }
+     */
 }
