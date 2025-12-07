@@ -12,9 +12,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Cho phép tải báo cáo user tự do
                         .requestMatchers("/api/users/report/**").permitAll()
                         .requestMatchers("/api/users/search").permitAll()
+                        .requestMatchers("/api/users/*/following-ids").permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();
