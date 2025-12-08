@@ -1,10 +1,12 @@
 package com.social.post_service.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
+@Data
 @Table(name = "posts")
 public class Post {
     @Id
@@ -18,6 +20,9 @@ public class Post {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    private Long likeCount = 0L;
+    private Long commentCount = 0L;
 
     public Post() {}
 
@@ -41,4 +46,18 @@ public class Post {
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public void setUserId(Long userId) { this.userId = userId; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public Long getLikeCount() {
+        return likeCount == null ? 0L : likeCount;
+    }
+    public void setLikeCount(Long likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public Long getCommentCount() {
+        return commentCount == null ? 0L : commentCount;
+    }
+    public void setCommentCount(Long commentCount) {
+        this.commentCount = commentCount;
+    }
 }

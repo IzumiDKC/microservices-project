@@ -36,24 +36,23 @@ public class PostService {
     }
 
     public List<PostResponse> getFeed(Long currentUserId) {
-        // Lấy danh sách ID đang follow
         List<Long> followingIds = userClient.getFollowingIds(currentUserId);
         followingIds.add(currentUserId);
 
-        // Query lấy Entity Post gốc
         List<Post> posts = postRepo.findByUserIdInOrderByCreatedAtDesc(followingIds);
 
-        // Map từ Entity -> DTO (Kèm theo số like, comment)
         return posts.stream().map(post -> {
             PostResponse dto = new PostResponse();
+
             dto.setId(post.getId());
             dto.setContent(post.getContent());
             dto.setCreatedAt(post.getCreatedAt());
             dto.setUserId(post.getUserId());
             dto.setUsername("User " + post.getUserId());
 
-            dto.setLikeCount(postLikeRepo.countByPostId(post.getId()));
-            dto.setCommentCount(commentRepo.countByPostId(post.getId()));
+            dto.setLikeCount(post.getLikeCount());
+            dto.setCommentCount(post.getCommentCount());
+
             dto.setLikedByCurrentUser(postLikeRepo.existsByPostIdAndUserId(post.getId(), currentUserId));
 
             return dto;
@@ -67,11 +66,19 @@ public class PostService {
         if (postLikeRepo.existsByPostIdAndUserId(postId, userId)) {
             PostLike like = postLikeRepo.findByPostIdAndUserId(postId, userId);
             postLikeRepo.delete(like);
+
+            if (post.getLikeCount() > 0) {
+                post.setLikeCount(post.getLikeCount() - 1);
+            }
         } else {
             PostLike newLike = new PostLike(postId, userId);
             postLikeRepo.save(newLike);
+
+            post.setLikeCount(post.getLikeCount() + 1);
         }
 
-        return postLikeRepo.countByPostId(postId);
+        postRepo.save(post);
+
+        return post.getLikeCount();
     }
 }

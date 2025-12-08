@@ -1,32 +1,41 @@
 package com.social.post_service.service;
 
 import com.social.post_service.entity.Comment;
+import com.social.post_service.entity.Post;
 import com.social.post_service.repository.CommentRepository;
+import com.social.post_service.repository.PostRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
 
-    public CommentService(CommentRepository commentRepository) {
+    public CommentService(CommentRepository commentRepository, PostRepository postRepository) {
         this.commentRepository = commentRepository;
+        this.postRepository = postRepository;
     }
 
-    // Hàm tạo comment
     public Comment saveComment(Comment comment) {
-        // Có thể thêm logic kiểm tra nội dung/tần suất ở đây
-        return commentRepository.save(comment);
+        Comment saved = commentRepository.save(comment);
+
+        Post post = postRepository.findById(comment.getPostId()).orElse(null);
+        if (post != null) {
+            post.setCommentCount(post.getCommentCount() + 1);
+            postRepository.save(post);
+        }
+        return saved;
     }
 
-    // Hàm lấy danh sách comment theo postId
     public List<Comment> getCommentsByPostId(Long postId) {
         return commentRepository.findByPostIdOrderByCreatedAtDesc(postId);
     }
 
-    // Xóa comment
     public void deleteComment(Long commentId, Long userId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
@@ -35,6 +44,17 @@ public class CommentService {
             throw new RuntimeException("Unauthorized to delete this comment");
         }
 
+        Long postId = comment.getPostId();
+
         commentRepository.delete(comment);
+
+        Post post = postRepository.findById(postId).orElse(null);
+        if (post != null) {
+            long currentCount = post.getCommentCount();
+            if (currentCount > 0) {
+                post.setCommentCount(currentCount - 1);
+                postRepository.save(post);
+            }
+        }
     }
 }
