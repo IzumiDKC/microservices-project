@@ -1,56 +1,84 @@
 package com.social.post_service.service;
 
-
 import com.social.post_service.client.UserClient;
+import com.social.post_service.dto.PostResponse; // Import DTO mới
 import com.social.post_service.entity.Post;
 import com.social.post_service.entity.PostLike;
+import com.social.post_service.repository.CommentRepository; // Import
 import com.social.post_service.repository.PostLikeRepository;
 import com.social.post_service.repository.PostRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
     private final PostRepository postRepo;
-    private final UserClient userClient; // Gọi sang User Service
+    private final UserClient userClient;
     private final PostLikeRepository postLikeRepo;
+    private final CommentRepository commentRepo;
 
-    public PostService(PostRepository postRepo, UserClient userClient, PostLikeRepository postLikeRepo) {
+    public PostService(PostRepository postRepo,
+                       UserClient userClient,
+                       PostLikeRepository postLikeRepo,
+                       CommentRepository commentRepo) {
         this.postRepo = postRepo;
         this.userClient = userClient;
         this.postLikeRepo = postLikeRepo;
+        this.commentRepo = commentRepo;
     }
 
     public Post createPost(Post post, String username) {
-        // Gọi User Service để lấy ID từ database
         Long userId = userClient.getUserIdByUsername(username);
-        // Gán ID vào bài viết
         post.setUserId(userId);
         return postRepo.save(post);
     }
-    public List<Post> getFeed(Long currentUserId) {
-        // Hỏi User Service: "User này đang follow ai?"
+
+    public List<PostResponse> getFeed(Long currentUserId) {
         List<Long> followingIds = userClient.getFollowingIds(currentUserId);
-        // Thêm chính mình vào để thấy bài của mình
         followingIds.add(currentUserId);
-        // Query bài viết
-        return postRepo.findByUserIdInOrderByCreatedAtDesc(followingIds);
+
+        List<Post> posts = postRepo.findByUserIdInOrderByCreatedAtDesc(followingIds);
+
+        return posts.stream().map(post -> {
+            PostResponse dto = new PostResponse();
+
+            dto.setId(post.getId());
+            dto.setContent(post.getContent());
+            dto.setCreatedAt(post.getCreatedAt());
+            dto.setUserId(post.getUserId());
+            dto.setUsername("User " + post.getUserId());
+
+            dto.setLikeCount(post.getLikeCount());
+            dto.setCommentCount(post.getCommentCount());
+
+            dto.setLikedByCurrentUser(postLikeRepo.existsByPostIdAndUserId(post.getId(), currentUserId));
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 
-    public String toggleLike(Long userId, Long postId) {
+    public long toggleLike(Long userId, Long postId) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
+
         if (postLikeRepo.existsByPostIdAndUserId(postId, userId)) {
-            // Đang like -> Xóa -> Trả về Unlike Success
             PostLike like = postLikeRepo.findByPostIdAndUserId(postId, userId);
             postLikeRepo.delete(like);
-            return "Unlike Success";
+
+            if (post.getLikeCount() > 0) {
+                post.setLikeCount(post.getLikeCount() - 1);
+            }
         } else {
-            // Chưa like -> Thêm -> Trả về Like Success
             PostLike newLike = new PostLike(postId, userId);
             postLikeRepo.save(newLike);
-            return "Like Success";
+
+            post.setLikeCount(post.getLikeCount() + 1);
         }
+
+        postRepo.save(post);
+
+        return post.getLikeCount();
     }
 }
