@@ -35,6 +35,10 @@ public class UserService {
         return follows.stream().map(Follow::getFollowingId).collect(Collectors.toList());
     }
 
+    public List<AppUser> searchUsers(String keyword) {
+        return userRepo.findByUsernameContainingIgnoreCase(keyword);
+    }
+
     public Long getUserIdByUsername(String username) {
         // Tìm trong DB xem có user này chưa
         java.util.Optional<AppUser> userOptional = userRepo.findByUsername(username);

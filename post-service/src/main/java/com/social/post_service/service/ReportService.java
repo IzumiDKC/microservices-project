@@ -23,22 +23,18 @@ public class ReportService {
     }
 
     public byte[] exportReport() throws FileNotFoundException, JRException {
-        // 1. Lấy toàn bộ bài viết từ DB
+        // ấy toàn bộ bài viết
         List<Post> posts = postRepo.findAll();
-
-        // 2. Load file template .jrxml
+        // Load file template .jrxml
         File file = ResourceUtils.getFile("classpath:reports/post-report.jrxml");
         JasperReport jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
-
-        // 3. Đổ dữ liệu vào báo cáo
+        // Fill data vào báo cáo
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(posts);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("createdBy", "Admin System");
-
-        // 4. Fill Report
+        // Fill Report
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
-
-        // 5. Xuất ra dạng byte array (PDF)
+        // Xuất dạng byte array (PDF)
         return JasperExportManager.exportReportToPdf(jasperPrint);
     }
 }

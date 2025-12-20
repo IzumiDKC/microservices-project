@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-// name phải trùng với spring.application.name bên User Service
 @FeignClient(name = "user-service")
 public interface UserClient {
     @GetMapping("/api/users/{userId}/following-ids")

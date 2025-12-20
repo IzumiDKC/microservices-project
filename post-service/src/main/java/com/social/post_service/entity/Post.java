@@ -34,12 +34,21 @@ public class Post {
         this.createdAt = createdAt;
     }
 
-    public Long getId() { return id; }
-    public String getContent() { return content; }
-    public String getImageUrl() { return imageUrl; }
-    public Long getUserId() { return userId; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-
+    public Long getId() {
+        return id;
+    }
+    public String getContent() {
+        return content;
+    }
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    public Long getUserId() {
+        return userId;
+    }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
     public void setId(Long id) { this.id = id; }
     public void setContent(String content) { this.content = content; }

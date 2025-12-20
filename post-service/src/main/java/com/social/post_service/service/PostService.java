@@ -62,23 +62,18 @@ public class PostService {
     public long toggleLike(Long userId, Long postId) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
-
         if (postLikeRepo.existsByPostIdAndUserId(postId, userId)) {
             PostLike like = postLikeRepo.findByPostIdAndUserId(postId, userId);
             postLikeRepo.delete(like);
-
             if (post.getLikeCount() > 0) {
                 post.setLikeCount(post.getLikeCount() - 1);
             }
         } else {
             PostLike newLike = new PostLike(postId, userId);
             postLikeRepo.save(newLike);
-
             post.setLikeCount(post.getLikeCount() + 1);
         }
-
         postRepo.save(post);
-
         return post.getLikeCount();
     }
 }
