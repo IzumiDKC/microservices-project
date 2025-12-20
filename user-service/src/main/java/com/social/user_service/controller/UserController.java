@@ -6,6 +6,8 @@ import com.social.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -25,7 +27,7 @@ public class UserController {
     @PostMapping("/{userId}/follow/{targetId}")
     public ResponseEntity<?> follow(@PathVariable Long userId, @PathVariable Long targetId) {
         userService.follow(userId, targetId);
-        return ResponseEntity.ok("Followed success");
+        return ResponseEntity.ok(Collections.singletonMap("message", "Followed success"));
     }
 
     // API này để Post Service gọi sang
@@ -38,5 +40,9 @@ public class UserController {
     public ResponseEntity<Long> getUserIdByUsername(@RequestParam String username) {
         Long userId = userService.getUserIdByUsername(username);
         return ResponseEntity.ok(userId);
+    }
+    @GetMapping("/search-list")
+    public ResponseEntity<List<AppUser>> searchUsers(@RequestParam String query) {
+        return ResponseEntity.ok(userService.searchUsers(query));
     }
 }

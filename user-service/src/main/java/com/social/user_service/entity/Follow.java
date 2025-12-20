@@ -13,18 +13,15 @@ public class Follow {
     private Long followerId;
     private Long followingId;
 
-    // --- 1. Constructor mặc định (Bắt buộc cho JPA) ---
     public Follow() {
     }
 
-    // --- 2. Constructor đầy đủ (Thay thế cho @Builder) ---
     public Follow(Long id, Long followerId, Long followingId) {
         this.id = id;
         this.followerId = followerId;
         this.followingId = followingId;
     }
 
-    // --- 3. Getter (Thay thế cho @Data) ---
     public Long getId() {
         return id;
     }
@@ -37,7 +34,6 @@ public class Follow {
         return followingId;
     }
 
-    // --- 4. Setter (Nếu cần) ---
     public void setFollowerId(Long followerId) {
         this.followerId = followerId;
     }

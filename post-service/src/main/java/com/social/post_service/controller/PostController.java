@@ -1,11 +1,11 @@
 package com.social.post_service.controller;
 
-import com.social.post_service.dto.PostResponse; // Import DTO
+import com.social.post_service.dto.PostResponse;
 import com.social.post_service.entity.Comment;
 import com.social.post_service.entity.Post;
 import com.social.post_service.service.CommentService;
 import com.social.post_service.service.PostService;
-import com.social.post_service.client.UserClient; // Import UserClient
+import com.social.post_service.client.UserClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -35,7 +35,6 @@ public class PostController {
         return ResponseEntity.ok(postService.createPost(post, username));
     }
 
-    // Trả về PostResponse và dùng Token để lấy ID người xem (chuẩn bảo mật)
     @GetMapping("/feed")
     public ResponseEntity<List<PostResponse>> getFeed(@AuthenticationPrincipal Jwt jwt) {
         String username = jwt.getClaimAsString("preferred_username");
@@ -54,7 +53,6 @@ public class PostController {
         return ResponseEntity.ok(newLikeCount);
     }
 
-    // ... (Giữ nguyên phần Comments ở dưới)
     @PostMapping("/{postId}/comments")
     public ResponseEntity<Comment> createComment(@PathVariable Long postId,
                                                  @RequestBody Comment commentRequest,
