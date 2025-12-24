@@ -14,4 +14,7 @@ public interface UserClient {
 
     @GetMapping("/api/users/search")
     Long getUserIdByUsername(@RequestParam("username") String username);
+
+    @GetMapping("/api/users/{id}/username")
+    String getUsernameById(@PathVariable("id") Long id);
 }
