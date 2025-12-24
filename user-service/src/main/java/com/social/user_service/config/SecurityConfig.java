@@ -24,6 +24,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/report/**").permitAll()
                         .requestMatchers("/api/users/search").permitAll()
                         .requestMatchers("/api/users/*/following-ids").permitAll()
+                        .requestMatchers("/api/users/*/username").permitAll()
                         .anyRequest().authenticated()
                 )
                         .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))

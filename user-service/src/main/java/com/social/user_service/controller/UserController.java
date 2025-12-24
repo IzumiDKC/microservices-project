@@ -45,4 +45,9 @@ public class UserController {
     public ResponseEntity<List<AppUser>> searchUsers(@RequestParam String query) {
         return ResponseEntity.ok(userService.searchUsers(query));
     }
+
+    @GetMapping("/{userId}/username")
+    public String getUsernameById(@PathVariable Long userId) {
+        return userService.getUsernameById(userId);
+    }
 }
