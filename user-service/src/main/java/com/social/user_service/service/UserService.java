@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -16,7 +17,7 @@ public class UserService {
         this.userRepo = userRepo;
         this.followRepo = followRepo;
     }
-    // Tạo user mới (để test)
+    // Tạo user mới
     public AppUser createUser(AppUser user) {
         return userRepo.save(user);
     }
@@ -24,12 +25,12 @@ public class UserService {
     // Follow user khác
     public void follow(Long followerId, Long followingId) {
         if (!followRepo.existsByFollowerIdAndFollowingId(followerId, followingId)) {
-            // Tham số đầu tiên là ID (để null vì nó tự tăng), sau đó là followerId, followingId
+            // Tham số đầu tiên là ID, sau đó là followerId, followingId
             Follow newFollow = new Follow(null, followerId, followingId);
             followRepo.save(newFollow);
         }
     }
-    // API nội bộ: Lấy danh sách ID những người đang follow
+    // Lấy danh sách ID những người đang follow
     public List<Long> getFollowingIds(Long userId) {
         List<Follow> follows = followRepo.findByFollowerId(userId);
         return follows.stream().map(Follow::getFollowingId).collect(Collectors.toList());
@@ -46,13 +47,20 @@ public class UserService {
         if (userOptional.isPresent()) {
             return userOptional.get().getId();
         } else {
-            // 2. Chưa có (Lần đầu đăng nhập bằng Keycloak) -> TỰ ĐỘNG TẠO MỚI
+            // Chưa có (Lần đầu đăng nhập bằng Keycloak) -> TỰ ĐỘNG TẠO MỚI
             AppUser newUser = new AppUser();
             newUser.setUsername(username);
-            newUser.setFullName(username); // Lấy username làm tên hiển thị
+            newUser.setFullName(username);
 
             AppUser savedUser = userRepo.save(newUser);
             return savedUser.getId();
         }
     }
+    // Lấy thông tin user từ ID
+    public String getUsernameById(Long userId) {
+        return userRepo.findById(userId)
+                .map(AppUser::getUsername)
+                .orElse("Unknown User");
+    }
+
 }
