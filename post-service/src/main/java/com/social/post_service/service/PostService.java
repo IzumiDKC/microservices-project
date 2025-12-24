@@ -40,19 +40,23 @@ public class PostService {
         followingIds.add(currentUserId);
 
         List<Post> posts = postRepo.findByUserIdInOrderByCreatedAtDesc(followingIds);
-
         return posts.stream().map(post -> {
             PostResponse dto = new PostResponse();
-
             dto.setId(post.getId());
             dto.setContent(post.getContent());
             dto.setCreatedAt(post.getCreatedAt());
             dto.setUserId(post.getUserId());
-            dto.setUsername("User " + post.getUserId());
+            try {
+                String realUsername = userClient.getUsernameById(post.getUserId());
+                dto.setUsername(realUsername);
+            } catch (Exception e) {
+                System.err.println("Bug " + post.getUserId() + ": " + e.getMessage());
+                e.printStackTrace();
 
+                dto.setUsername("Unknown User");
+            }
             dto.setLikeCount(post.getLikeCount());
             dto.setCommentCount(post.getCommentCount());
-
             dto.setLikedByCurrentUser(postLikeRepo.existsByPostIdAndUserId(post.getId(), currentUserId));
 
             return dto;
