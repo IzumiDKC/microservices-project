@@ -4,8 +4,12 @@ import com.social.user_service.entity.AppUser;
 import com.social.user_service.repository.AppUserRepository;
 import com.social.user_service.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -49,5 +53,15 @@ public class UserController {
     @GetMapping("/{userId}/username")
     public String getUsernameById(@PathVariable Long userId) {
         return userService.getUsernameById(userId);
+    }
+    @PostMapping(value = "/me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AppUser> uploadAvatar(@RequestParam("file") MultipartFile file,
+                                                @AuthenticationPrincipal Jwt jwt) {
+        String username = jwt.getClaimAsString("preferred_username");
+        return ResponseEntity.ok(userService.updateAvatar(username, file));
+    }
+    @GetMapping("/{username}")
+    public ResponseEntity<AppUser> getUserInfo(@PathVariable String username) {
+        return ResponseEntity.ok(userService.getUserInfo(username));
     }
 }
