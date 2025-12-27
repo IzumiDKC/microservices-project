@@ -8,6 +8,7 @@ import com.social.post_service.repository.CommentRepository; // Import
 import com.social.post_service.repository.PostLikeRepository;
 import com.social.post_service.repository.PostRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,5 +80,18 @@ public class PostService {
         }
         postRepo.save(post);
         return post.getLikeCount();
+    }
+    @Transactional
+    public void deletePost(Long postId, Long currentUserId) {
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        if (!post.getUserId().equals(currentUserId)) {
+            throw new RuntimeException("Unauthorized: You are not the owner of this post");
+        }
+        postLikeRepo.deleteByPostId(postId);
+        commentRepo.deleteByPostId(postId);
+
+        postRepo.delete(post);
     }
 }
