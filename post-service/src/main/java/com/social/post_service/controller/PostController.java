@@ -82,4 +82,18 @@ public class PostController {
         commentService.deleteComment(commentId, userId);
         return ResponseEntity.ok("Comment deleted successfully");
     }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable Long postId,
+                                             @AuthenticationPrincipal Jwt jwt) {
+        String username = jwt.getClaimAsString("preferred_username");
+        Long userId = userClient.getUserIdByUsername(username);
+
+        try {
+            postService.deletePost(postId, userId);
+            return ResponseEntity.ok("Post deleted successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
