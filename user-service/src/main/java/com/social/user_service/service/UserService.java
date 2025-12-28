@@ -71,7 +71,6 @@ public class UserService {
         AppUser user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Gọi hàm upload lên mây -> nhận về link https://res.cloudinary.com/...
         String avatarUrl = cloudinaryService.uploadAvatar(file);
 
         user.setAvatarUrl(avatarUrl);
@@ -82,5 +81,11 @@ public class UserService {
     public AppUser getUserInfo(String username) {
         return userRepo.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public String getAvatarById(Long userId) {
+        return userRepo.findById(userId)
+                .map(AppUser::getAvatarUrl)
+                .orElse(null);
     }
 }

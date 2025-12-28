@@ -1,5 +1,6 @@
 package com.social.post_service.controller;
 
+import com.social.post_service.dto.CommentResponse;
 import com.social.post_service.dto.PostResponse;
 import com.social.post_service.entity.Comment;
 import com.social.post_service.entity.Post;
@@ -68,9 +69,8 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<List<Comment>> getComments(@PathVariable Long postId) {
-        List<Comment> comments = commentService.getCommentsByPostId(postId);
-        return ResponseEntity.ok(comments);
+    public ResponseEntity<List<CommentResponse>> getComments(@PathVariable Long postId) {
+        return ResponseEntity.ok(commentService.getCommentsByPostId(postId));
     }
 
     @DeleteMapping("/comments/{commentId}")
