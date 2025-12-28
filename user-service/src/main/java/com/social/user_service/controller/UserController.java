@@ -64,4 +64,9 @@ public class UserController {
     public ResponseEntity<AppUser> getUserInfo(@PathVariable String username) {
         return ResponseEntity.ok(userService.getUserInfo(username));
     }
+
+    @GetMapping("/{id}/avatar")
+    public String getAvatarById(@PathVariable Long id) {
+        return userService.getAvatarById(id);
+    }
 }
