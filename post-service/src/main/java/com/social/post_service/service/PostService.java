@@ -50,11 +50,14 @@ public class PostService {
             try {
                 String realUsername = userClient.getUsernameById(post.getUserId());
                 dto.setUsername(realUsername);
+                String avatarUrl = userClient.getAvatarById(post.getUserId());
+                dto.setAvatarUrl(avatarUrl);
             } catch (Exception e) {
                 System.err.println("Bug " + post.getUserId() + ": " + e.getMessage());
                 e.printStackTrace();
 
                 dto.setUsername("Unknown User");
+                dto.setAvatarUrl(null);
             }
             dto.setLikeCount(post.getLikeCount());
             dto.setCommentCount(post.getCommentCount());

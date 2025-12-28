@@ -15,6 +15,8 @@ public class PostResponse {
     private long commentCount;
     private boolean isLikedByCurrentUser;
 
+    private String avatarUrl;
+
     public PostResponse() {
 
     }
@@ -45,4 +47,8 @@ public class PostResponse {
 
     public boolean isLikedByCurrentUser() { return isLikedByCurrentUser; }
     public void setLikedByCurrentUser(boolean likedByCurrentUser) { isLikedByCurrentUser = likedByCurrentUser; }
+
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
 }
