@@ -48,8 +48,8 @@ public class CommentService {
             dto.setUserId(comment.getUserId());
             dto.setPostId(comment.getPostId());
             dto.setCreatedAt(comment.getCreatedAt());
-
-            // Gọi sang User Service lấy thông tin
+            dto.setParentId(comment.getParentId());
+            // Gọi User Service
             try {
                 dto.setUsername(userClient.getUsernameById(comment.getUserId()));
                 dto.setAvatarUrl(userClient.getAvatarById(comment.getUserId()));

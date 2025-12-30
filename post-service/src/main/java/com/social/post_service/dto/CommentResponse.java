@@ -12,6 +12,8 @@ public class CommentResponse {
     private String username;
     private String avatarUrl;
 
+    private Long parentId;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -32,4 +34,7 @@ public class CommentResponse {
 
     public String getAvatarUrl() { return avatarUrl; }
     public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
+    public Long getParentId() { return parentId; }
+    public void setParentId(Long parentId) { this.parentId = parentId; }
 }
