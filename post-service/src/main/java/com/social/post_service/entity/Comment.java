@@ -17,8 +17,9 @@ public class Comment {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public Comment() {
+    private Long parentId;
 
+    public Comment() {
     }
 
     public Comment(Long postId, Long userId, String content) {
@@ -60,4 +61,6 @@ public class Comment {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+    public Long getParentId() { return parentId; }
+    public void setParentId(Long parentId) { this.parentId = parentId; }
 }
