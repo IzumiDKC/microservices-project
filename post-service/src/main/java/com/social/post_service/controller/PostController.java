@@ -49,8 +49,8 @@ public class PostController {
                                          @AuthenticationPrincipal Jwt jwt) {
         String username = jwt.getClaimAsString("preferred_username");
         Long userId = userClient.getUserIdByUsername(username);
+        long newLikeCount = postService.toggleLike(userId, postId, username);
 
-        long newLikeCount = postService.toggleLike(userId, postId);
         return ResponseEntity.ok(newLikeCount);
     }
 
