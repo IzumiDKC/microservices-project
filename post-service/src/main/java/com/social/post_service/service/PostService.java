@@ -167,4 +167,31 @@ public class PostService {
 
         postRepo.delete(post);
     }
+
+    public List<PostResponse> getPostsByUserId(Long userId, Long currentUserId) {
+        List<Post> posts = postRepo.findByUserIdOrderByCreatedAtDesc(userId);
+
+        return posts.stream().map(post -> {
+            PostResponse dto = new PostResponse();
+            dto.setId(post.getId());
+            dto.setContent(post.getContent());
+            dto.setCreatedAt(post.getCreatedAt());
+            dto.setUserId(post.getUserId());
+
+            try {
+                String realUsername = userClient.getUsernameById(post.getUserId());
+                dto.setUsername(realUsername);
+                String avatarUrl = userClient.getAvatarById(post.getUserId());
+                dto.setAvatarUrl(avatarUrl);
+            } catch (Exception e) {
+                dto.setUsername("Unknown");
+            }
+
+            dto.setLikeCount(post.getLikeCount());
+            dto.setCommentCount(post.getCommentCount());
+            dto.setLikedByCurrentUser(postLikeRepo.existsByPostIdAndUserId(post.getId(), currentUserId));
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
 }

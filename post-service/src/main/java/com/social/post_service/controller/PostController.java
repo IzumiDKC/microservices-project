@@ -61,10 +61,14 @@ public class PostController {
         String username = jwt.getClaimAsString("preferred_username");
         Long userId = userClient.getUserIdByUsername(username);
 
-        commentRequest.setPostId(postId);
-        commentRequest.setUserId(userId);
+        Comment savedComment = postService.createComment(
+                postId,
+                commentRequest.getContent(),
+                commentRequest.getParentId(),
+                userId,
+                username
+        );
 
-        Comment savedComment = commentService.saveComment(commentRequest);
         return ResponseEntity.ok(savedComment);
     }
 
@@ -95,5 +99,15 @@ public class PostController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+    @GetMapping("/user/{targetUserId}")
+    public ResponseEntity<List<PostResponse>> getPostsByUser(
+            @PathVariable Long targetUserId,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        String username = jwt.getClaimAsString("preferred_username");
+        Long currentUserId = userClient.getUserIdByUsername(username);
+
+        return ResponseEntity.ok(postService.getPostsByUserId(targetUserId, currentUserId));
     }
 }
