@@ -5,7 +5,7 @@ import com.social.user_service.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import com.social.user_service.dto.UserResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Optional;
@@ -78,9 +78,26 @@ public class UserService {
         return userRepo.save(user);
     }
 
-    public AppUser getUserInfo(String username) {
-        return userRepo.findByUsername(username)
+    // Thay đổi kiểu trả về từ AppUser -> UserResponse
+    public UserResponse getUserInfo(String username) {
+        AppUser user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        UserResponse response = new UserResponse();
+
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setAvatarUrl(user.getAvatarUrl());
+        response.setBio(user.getBio());
+
+        long followers = followRepo.countByFollowingId(user.getId());
+        long following = followRepo.countByFollowerId(user.getId());
+
+        response.setFollowerCount(followers);
+        response.setFollowingCount(following);
+
+        return response;
     }
 
     public String getAvatarById(Long userId) {

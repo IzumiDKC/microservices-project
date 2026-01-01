@@ -1,5 +1,6 @@
 package com.social.user_service.controller;
 
+import com.social.user_service.dto.UserResponse;
 import com.social.user_service.entity.AppUser;
 import com.social.user_service.repository.AppUserRepository;
 import com.social.user_service.service.UserService;
@@ -61,7 +62,7 @@ public class UserController {
         return ResponseEntity.ok(userService.updateAvatar(username, file));
     }
     @GetMapping("/{username}")
-    public ResponseEntity<AppUser> getUserInfo(@PathVariable String username) {
+    public ResponseEntity<UserResponse> getUserInfo(@PathVariable String username) {
         return ResponseEntity.ok(userService.getUserInfo(username));
     }
 
