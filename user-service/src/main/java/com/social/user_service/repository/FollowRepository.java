@@ -15,5 +15,9 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     // Post Service lấy danh sách Newsfeed)
     List<Follow> findByFollowerId(Long followerId);
 
-     void deleteByFollowerIdAndFollowingId(Long followerId, Long followingId);
+    void deleteByFollowerIdAndFollowingId(Long followerId, Long followingId);
+
+    long countByFollowingId(Long followingId);
+
+    long countByFollowerId(Long followerId);
 }
