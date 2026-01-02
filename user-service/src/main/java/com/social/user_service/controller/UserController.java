@@ -1,6 +1,7 @@
 package com.social.user_service.controller;
 
 import com.social.user_service.dto.UserResponse;
+import com.social.user_service.dto.UserUpdateRequest;
 import com.social.user_service.entity.AppUser;
 import com.social.user_service.repository.AppUserRepository;
 import com.social.user_service.service.UserService;
@@ -69,5 +70,11 @@ public class UserController {
     @GetMapping("/{id}/avatar")
     public String getAvatarById(@PathVariable Long id) {
         return userService.getAvatarById(id);
+    }
+    @PutMapping("/me")
+    public ResponseEntity<UserResponse> updateProfile(@RequestBody UserUpdateRequest request,
+                                                      @AuthenticationPrincipal Jwt jwt) {
+        String username = jwt.getClaimAsString("preferred_username");
+        return ResponseEntity.ok(userService.updateProfile(username, request));
     }
 }
