@@ -1,5 +1,6 @@
 package com.social.user_service.service;
 
+import com.social.user_service.dto.UserUpdateRequest;
 import com.social.user_service.entity.*;
 import com.social.user_service.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -87,6 +88,9 @@ public class UserService {
 
         response.setId(user.getId());
         response.setUsername(user.getUsername());
+
+        response.setFullName(user.getFullName() != null ? user.getFullName() : user.getUsername());
+
         response.setEmail(user.getEmail());
         response.setAvatarUrl(user.getAvatarUrl());
         response.setBio(user.getBio());
@@ -104,5 +108,21 @@ public class UserService {
         return userRepo.findById(userId)
                 .map(AppUser::getAvatarUrl)
                 .orElse(null);
+    }
+
+    public UserResponse updateProfile(String username, UserUpdateRequest request) {
+        AppUser user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (request.getFullName() != null) {
+            user.setFullName(request.getFullName());
+        }
+        if (request.getBio() != null) {
+            user.setBio(request.getBio());
+        }
+
+        AppUser savedUser = userRepo.save(user);
+
+        return getUserInfo(savedUser.getUsername());
     }
 }
