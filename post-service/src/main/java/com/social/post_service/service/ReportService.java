@@ -23,7 +23,7 @@ public class ReportService {
     }
 
     public byte[] exportReport() throws FileNotFoundException, JRException {
-        // ấy toàn bộ bài viết
+        // Lấy toàn bộ bài viết
         List<Post> posts = postRepo.findAll();
         // Load file template .jrxml
         File file = ResourceUtils.getFile("classpath:reports/post-report.jrxml");
