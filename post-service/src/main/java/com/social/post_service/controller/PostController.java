@@ -110,4 +110,12 @@ public class PostController {
 
         return ResponseEntity.ok(postService.getPostsByUserId(targetUserId, currentUserId));
     }
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponse> getPostDetail(@PathVariable Long postId,
+                                                      @AuthenticationPrincipal Jwt jwt) {
+        String username = jwt.getClaimAsString("preferred_username");
+        Long currentUserId = userClient.getUserIdByUsername(username);
+
+        return ResponseEntity.ok(postService.getPostById(postId, currentUserId));
+    }
 }
