@@ -194,4 +194,23 @@ public class PostService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    public PostResponse getPostById(Long postId, Long currentUserId) {
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+        //  Map sang DTO
+        PostResponse dto = new PostResponse();
+        dto.setId(post.getId());
+        dto.setContent(post.getContent());
+        dto.setCreatedAt(post.getCreatedAt());
+        dto.setUserId(post.getUserId());
+        dto.setUsername("User " + post.getUserId());
+
+        dto.setLikeCount(post.getLikeCount());
+        dto.setCommentCount(post.getCommentCount());
+
+        dto.setLikedByCurrentUser(postLikeRepo.existsByPostIdAndUserId(postId, currentUserId));
+
+        return dto;
+    }
 }
