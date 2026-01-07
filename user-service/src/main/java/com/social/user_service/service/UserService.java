@@ -1,15 +1,15 @@
 package com.social.user_service.service;
 
+import com.social.user_service.dto.UserResponse;
 import com.social.user_service.dto.UserUpdateRequest;
 import com.social.user_service.entity.*;
 import com.social.user_service.repository.*;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.social.user_service.dto.UserResponse;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -22,74 +22,118 @@ public class UserService {
         this.followRepo = followRepo;
         this.cloudinaryService = cloudinaryService;
     }
-    // Tạo user mới
+
+    @org.springframework.transaction.annotation.Transactional
+    public AppUser syncUser(String username, String firstName, String lastName, String email) {
+        AppUser user = userRepo.findByUsername(username).orElse(new AppUser());
+
+        user.setUsername(username);
+        user.setEmail(email);
+
+        String fullNameFromKeycloak = "";
+        if (firstName != null && !firstName.isEmpty()) fullNameFromKeycloak += firstName + " ";
+        if (lastName != null && !lastName.isEmpty()) fullNameFromKeycloak += lastName;
+        fullNameFromKeycloak = fullNameFromKeycloak.trim();
+
+        if (!fullNameFromKeycloak.isEmpty()) {
+            user.setFullName(fullNameFromKeycloak);
+        } else {
+            if (user.getFullName() == null || user.getFullName().isEmpty()) {
+                user.setFullName(username);
+            }
+        }
+
+        return userRepo.save(user);
+    }
+
+    public UserResponse getUserInfo(String username) {
+        AppUser user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+        return mapToUserResponse(user);
+    }
+
+    public UserResponse getUserById(Long userId) {
+        AppUser user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        return mapToUserResponse(user);
+    }
+
+
     public AppUser createUser(AppUser user) {
         return userRepo.save(user);
     }
 
-    // Follow user khác
+    // Follow
+    @Transactional
     public void follow(Long followerId, Long followingId) {
         if (!followRepo.existsByFollowerIdAndFollowingId(followerId, followingId)) {
-            // Tham số đầu tiên là ID, sau đó là followerId, followingId
             Follow newFollow = new Follow(null, followerId, followingId);
             followRepo.save(newFollow);
         }
     }
-    // Lấy danh sách ID những người đang follow
+
+    // Lấy danh sách đang follow
     public List<Long> getFollowingIds(Long userId) {
-        List<Follow> follows = followRepo.findByFollowerId(userId);
-        return follows.stream().map(Follow::getFollowingId).collect(Collectors.toList());
+        return followRepo.findByFollowerId(userId)
+                .stream()
+                .map(Follow::getFollowingId)
+                .collect(Collectors.toList());
     }
 
+    // Tìm kiếm
     public List<AppUser> searchUsers(String keyword) {
         return userRepo.findByUsernameContainingIgnoreCase(keyword);
     }
 
     public Long getUserIdByUsername(String username) {
-        // Tìm trong DB xem có user này chưa
-        java.util.Optional<AppUser> userOptional = userRepo.findByUsername(username);
-
-        if (userOptional.isPresent()) {
-            return userOptional.get().getId();
-        } else {
-            // Chưa có (Lần đầu đăng nhập bằng Keycloak) -> TỰ ĐỘNG TẠO MỚI
-            AppUser newUser = new AppUser();
-            newUser.setUsername(username);
-            newUser.setFullName(username);
-
-            AppUser savedUser = userRepo.save(newUser);
-            return savedUser.getId();
-        }
+        AppUser user = syncUser(username, null, null, null);
+        return user.getId();
     }
-    // Lấy thông tin user từ ID
+
+    // Legacy support
     public String getUsernameById(Long userId) {
-        return userRepo.findById(userId)
-                .map(AppUser::getUsername)
-                .orElse("Unknown User");
+        return userRepo.findById(userId).map(AppUser::getUsername).orElse("Unknown");
     }
 
+    public String getAvatarById(Long userId) {
+        return userRepo.findById(userId).map(AppUser::getAvatarUrl).orElse(null);
+    }
+
+    @Transactional
     public AppUser updateAvatar(String username, MultipartFile file) {
         AppUser user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         String avatarUrl = cloudinaryService.uploadAvatar(file);
-
         user.setAvatarUrl(avatarUrl);
-
         return userRepo.save(user);
     }
 
-    // Thay đổi kiểu trả về từ AppUser -> UserResponse
-    public UserResponse getUserInfo(String username) {
+    @Transactional
+    public UserResponse updateProfile(String username, UserUpdateRequest request) {
         AppUser user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        UserResponse response = new UserResponse();
+        if (request.getFullName() != null && !request.getFullName().trim().isEmpty()) {
+            user.setFullName(request.getFullName());
+        }
+        if (request.getBio() != null) {
+            user.setBio(request.getBio());
+        }
 
+        AppUser savedUser = userRepo.save(user);
+        return mapToUserResponse(savedUser);
+    }
+
+    private UserResponse mapToUserResponse(AppUser user) {
+        UserResponse response = new UserResponse();
         response.setId(user.getId());
         response.setUsername(user.getUsername());
 
-        response.setFullName(user.getFullName() != null ? user.getFullName() : user.getUsername());
+        // Ưu tiên FullName, fallback về Username
+        response.setFullName(user.getFullName() != null && !user.getFullName().isEmpty()
+                ? user.getFullName()
+                : user.getUsername());
 
         response.setEmail(user.getEmail());
         response.setAvatarUrl(user.getAvatarUrl());
@@ -104,25 +148,4 @@ public class UserService {
         return response;
     }
 
-    public String getAvatarById(Long userId) {
-        return userRepo.findById(userId)
-                .map(AppUser::getAvatarUrl)
-                .orElse(null);
-    }
-
-    public UserResponse updateProfile(String username, UserUpdateRequest request) {
-        AppUser user = userRepo.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (request.getFullName() != null) {
-            user.setFullName(request.getFullName());
-        }
-        if (request.getBio() != null) {
-            user.setBio(request.getBio());
-        }
-
-        AppUser savedUser = userRepo.save(user);
-
-        return getUserInfo(savedUser.getUsername());
-    }
 }

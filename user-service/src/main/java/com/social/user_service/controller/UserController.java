@@ -36,7 +36,7 @@ public class UserController {
         return ResponseEntity.ok(Collections.singletonMap("message", "Followed success"));
     }
 
-    // API này để Post Service gọi sang
+    // Post Service gọi sang
     @GetMapping("/{userId}/following-ids")
     public ResponseEntity<List<Long>> getFollowingIds(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getFollowingIds(userId));
@@ -71,10 +71,30 @@ public class UserController {
     public String getAvatarById(@PathVariable Long id) {
         return userService.getAvatarById(id);
     }
-    @PutMapping("/me")
-    public ResponseEntity<UserResponse> updateProfile(@RequestBody UserUpdateRequest request,
-                                                      @AuthenticationPrincipal Jwt jwt) {
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
         String username = jwt.getClaimAsString("preferred_username");
+
+        String firstName = jwt.getClaimAsString("given_name");
+        String lastName = jwt.getClaimAsString("family_name");
+        String email = jwt.getClaimAsString("email");
+
+        userService.syncUser(username, firstName, lastName, email);
+
+        return ResponseEntity.ok(userService.getUserInfo(username));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<UserResponse> updateProfile(
+            @RequestBody UserUpdateRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        String username = jwt.getClaimAsString("preferred_username");
+
         return ResponseEntity.ok(userService.updateProfile(username, request));
+    }
+    @GetMapping("/id/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 }
