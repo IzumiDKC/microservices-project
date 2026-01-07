@@ -4,6 +4,7 @@ import com.social.post_service.client.NotificationClient;
 import com.social.post_service.client.UserClient;
 import com.social.post_service.dto.NotificationRequest;
 import com.social.post_service.dto.PostResponse;
+import com.social.post_service.dto.UserDto;
 import com.social.post_service.entity.Comment;
 import com.social.post_service.entity.Post;
 import com.social.post_service.entity.PostLike;
@@ -12,6 +13,7 @@ import com.social.post_service.repository.PostLikeRepository;
 import com.social.post_service.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,22 +26,32 @@ public class PostService {
     private final PostLikeRepository postLikeRepo;
     private final CommentRepository commentRepo;
     private final NotificationClient notificationClient;
+    private final CloudinaryService cloudinaryService;
 
     public PostService(PostRepository postRepo,
                        UserClient userClient,
                        PostLikeRepository postLikeRepo,
                        CommentRepository commentRepo,
-                       NotificationClient notificationClient) {
+                       NotificationClient notificationClient,
+                       CloudinaryService cloudinaryService
+    ) {
         this.postRepo = postRepo;
         this.userClient = userClient;
         this.postLikeRepo = postLikeRepo;
         this.commentRepo = commentRepo;
         this.notificationClient = notificationClient;
+        this.cloudinaryService = cloudinaryService;
     }
 
-    public Post createPost(Post post, String username) {
+    public Post createPost(Post post, MultipartFile file, String username) {
         Long userId = userClient.getUserIdByUsername(username);
         post.setUserId(userId);
+
+        if (file != null && !file.isEmpty()) {
+            String imageUrl = cloudinaryService.uploadFile(file);
+            post.setImageUrl(imageUrl);
+        }
+
         return postRepo.save(post);
     }
 
@@ -48,28 +60,7 @@ public class PostService {
         followingIds.add(currentUserId);
 
         List<Post> posts = postRepo.findByUserIdInOrderByCreatedAtDesc(followingIds);
-        return posts.stream().map(post -> {
-            PostResponse dto = new PostResponse();
-            dto.setId(post.getId());
-            dto.setContent(post.getContent());
-            dto.setCreatedAt(post.getCreatedAt());
-            dto.setUserId(post.getUserId());
-            try {
-                String realUsername = userClient.getUsernameById(post.getUserId());
-                dto.setUsername(realUsername);
-                String avatarUrl = userClient.getAvatarById(post.getUserId());
-                dto.setAvatarUrl(avatarUrl);
-            } catch (Exception e) {
-                System.err.println("Error fetching user info for post " + post.getId());
-                dto.setUsername("Unknown User");
-                dto.setAvatarUrl(null);
-            }
-            dto.setLikeCount(post.getLikeCount());
-            dto.setCommentCount(post.getCommentCount());
-            dto.setLikedByCurrentUser(postLikeRepo.existsByPostIdAndUserId(post.getId(), currentUserId));
-
-            return dto;
-        }).collect(Collectors.toList());
+        return posts.stream().map(post -> mapToPostResponse(post, currentUserId)).collect(Collectors.toList());
     }
 
     public long toggleLike(Long userId, Long postId, String username) {
@@ -170,47 +161,46 @@ public class PostService {
 
     public List<PostResponse> getPostsByUserId(Long userId, Long currentUserId) {
         List<Post> posts = postRepo.findByUserIdOrderByCreatedAtDesc(userId);
-
-        return posts.stream().map(post -> {
-            PostResponse dto = new PostResponse();
-            dto.setId(post.getId());
-            dto.setContent(post.getContent());
-            dto.setCreatedAt(post.getCreatedAt());
-            dto.setUserId(post.getUserId());
-
-            try {
-                String realUsername = userClient.getUsernameById(post.getUserId());
-                dto.setUsername(realUsername);
-                String avatarUrl = userClient.getAvatarById(post.getUserId());
-                dto.setAvatarUrl(avatarUrl);
-            } catch (Exception e) {
-                dto.setUsername("Unknown");
-            }
-
-            dto.setLikeCount(post.getLikeCount());
-            dto.setCommentCount(post.getCommentCount());
-            dto.setLikedByCurrentUser(postLikeRepo.existsByPostIdAndUserId(post.getId(), currentUserId));
-
-            return dto;
-        }).collect(Collectors.toList());
+        return posts.stream().map(post -> mapToPostResponse(post, currentUserId)).collect(Collectors.toList());
     }
 
     public PostResponse getPostById(Long postId, Long currentUserId) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
-        //  Map sang DTO
+
+        return mapToPostResponse(post, currentUserId);
+    }
+    private PostResponse mapToPostResponse(Post post, Long currentUserId) {
         PostResponse dto = new PostResponse();
         dto.setId(post.getId());
         dto.setContent(post.getContent());
+        dto.setImageUrl(post.getImageUrl());
         dto.setCreatedAt(post.getCreatedAt());
         dto.setUserId(post.getUserId());
-        dto.setUsername("User " + post.getUserId());
+
+        try {
+            UserDto user = userClient.getUserById(post.getUserId());
+            dto.setUsername(user.getUsername());
+            dto.setAvatarUrl(user.getAvatarUrl());
+
+            String displayName = user.getFullName();
+
+            if (displayName == null || displayName.trim().isEmpty()) {
+                displayName = user.getUsername();
+            }
+
+            dto.setFullName(displayName);
+
+        } catch (Exception e) {
+            // Fallback nếu User Service lỗi
+            dto.setUsername("Unknown User");
+            dto.setFullName("Unknown User");
+            dto.setAvatarUrl(null);
+        }
 
         dto.setLikeCount(post.getLikeCount());
         dto.setCommentCount(post.getCommentCount());
-
-        dto.setLikedByCurrentUser(postLikeRepo.existsByPostIdAndUserId(postId, currentUserId));
-
+        dto.setLikedByCurrentUser(postLikeRepo.existsByPostIdAndUserId(post.getId(), currentUserId));
         return dto;
     }
 }
