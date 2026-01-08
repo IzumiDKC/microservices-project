@@ -14,4 +14,5 @@ public class UserResponse {
 
     private long followerCount;
     private long followingCount;
-}
+
+    private boolean followedByCurrentUser;}
