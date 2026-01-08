@@ -8,7 +8,7 @@ import com.social.post_service.repository.CommentRepository;
 import com.social.post_service.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.social.post_service.dto.UserDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,12 +49,22 @@ public class CommentService {
             dto.setPostId(comment.getPostId());
             dto.setCreatedAt(comment.getCreatedAt());
             dto.setParentId(comment.getParentId());
-            // Gọi User Service
+
             try {
-                dto.setUsername(userClient.getUsernameById(comment.getUserId()));
-                dto.setAvatarUrl(userClient.getAvatarById(comment.getUserId()));
+                UserDto user = userClient.getUserById(comment.getUserId());
+
+                dto.setUsername(user.getUsername());
+                dto.setAvatarUrl(user.getAvatarUrl());
+
+                String displayName = user.getFullName();
+                if (displayName == null || displayName.trim().isEmpty()) {
+                    displayName = user.getUsername();
+                }
+                dto.setFullName(displayName);
+
             } catch (Exception e) {
                 dto.setUsername("Unknown");
+                dto.setFullName("Unknown User");
                 dto.setAvatarUrl(null);
             }
             return dto;
