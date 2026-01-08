@@ -62,26 +62,35 @@ public class UserController {
         String username = jwt.getClaimAsString("preferred_username");
         return ResponseEntity.ok(userService.updateAvatar(username, file));
     }
+
     @GetMapping("/{username}")
-    public ResponseEntity<UserResponse> getUserInfo(@PathVariable String username) {
-        return ResponseEntity.ok(userService.getUserInfo(username));
+    public ResponseEntity<UserResponse> getUserInfo(
+            @PathVariable String username,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        String currentUsername = null;
+        if (jwt != null) {
+            currentUsername = jwt.getClaimAsString("preferred_username");
+        }
+
+        return ResponseEntity.ok(userService.getUserInfo(username, currentUsername));
     }
 
     @GetMapping("/{id}/avatar")
     public String getAvatarById(@PathVariable Long id) {
         return userService.getAvatarById(id);
     }
+
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
         String username = jwt.getClaimAsString("preferred_username");
-
         String firstName = jwt.getClaimAsString("given_name");
         String lastName = jwt.getClaimAsString("family_name");
         String email = jwt.getClaimAsString("email");
 
         userService.syncUser(username, firstName, lastName, email);
 
-        return ResponseEntity.ok(userService.getUserInfo(username));
+        return ResponseEntity.ok(userService.getUserInfo(username, username));
     }
 
     @PutMapping("/me")
@@ -93,6 +102,7 @@ public class UserController {
 
         return ResponseEntity.ok(userService.updateProfile(username, request));
     }
+
     @GetMapping("/id/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));

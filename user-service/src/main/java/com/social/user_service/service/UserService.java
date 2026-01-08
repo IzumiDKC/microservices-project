@@ -46,10 +46,19 @@ public class UserService {
         return userRepo.save(user);
     }
 
-    public UserResponse getUserInfo(String username) {
-        AppUser user = userRepo.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
-        return mapToUserResponse(user);
+    public UserResponse getUserInfo(String targetUsername, String currentUsername) {
+        AppUser targetUser = userRepo.findByUsername(targetUsername)
+                .orElseThrow(() -> new RuntimeException("User not found: " + targetUsername));
+
+        UserResponse dto = mapToUserResponse(targetUser);
+
+        if (currentUsername != null) {
+            Long currentUserId = getUserIdByUsername(currentUsername);
+            boolean isFollowing = followRepo.existsByFollowerIdAndFollowingId(currentUserId, targetUser.getId());
+            dto.setFollowedByCurrentUser(isFollowing);
+        }
+
+        return dto;
     }
 
     public UserResponse getUserById(Long userId) {
@@ -66,7 +75,11 @@ public class UserService {
     // Follow
     @Transactional
     public void follow(Long followerId, Long followingId) {
-        if (!followRepo.existsByFollowerIdAndFollowingId(followerId, followingId)) {
+        if (followRepo.existsByFollowerIdAndFollowingId(followerId, followingId)) {
+            // Đã follow -> XÓA (Unfollow)
+            followRepo.deleteByFollowerIdAndFollowingId(followerId, followingId);
+        } else {
+            // Chưa follow -> THÊM (Follow)
             Follow newFollow = new Follow(null, followerId, followingId);
             followRepo.save(newFollow);
         }
@@ -147,5 +160,6 @@ public class UserService {
 
         return response;
     }
+
 
 }
