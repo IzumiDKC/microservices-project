@@ -90,7 +90,6 @@ public class UserController {
 
         userService.syncUser(username, firstName, lastName, email);
 
-        // Xem chính mình thì tham số thứ 2 cũng là mình (hoặc null tùy logic, nhưng để username cho an toàn)
         return ResponseEntity.ok(userService.getUserInfo(username, username));
     }
 
@@ -101,8 +100,6 @@ public class UserController {
 
         String username = jwt.getClaimAsString("preferred_username");
 
-        // Update xong trả về info mới -> Cũng cần gọi getUserInfo với 2 tham số bên trong Service
-        // Nhưng hàm updateProfile của bạn đang trả về UserResponse, hãy kiểm tra lại Service
         return ResponseEntity.ok(userService.updateProfile(username, request));
     }
 
