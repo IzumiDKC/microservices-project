@@ -1,6 +1,6 @@
 # Microservices Project
 
-Dự án backend mạng xã hội xây dựng theo kiến trúc Microservices, bao gồm các dịch vụ quản lý User, Post, được điều phối bởi API Gateway và sử dụng Service Discovery.
+Dự án backend mạng xã hội xây dựng theo kiến trúc Microservices, bao gồm các dịch vụ quản lý User, Post, Notification, được điều phối bởi API Gateway và sử dụng Service Discovery.
 
 ## 📋 Tổng quan hệ thống
 
@@ -12,6 +12,8 @@ Hệ thống bao gồm 4 dịch vụ chính hoạt động độc lập và liê
 | **API Gateway** | `8081` | Cổng vào duy nhất, định tuyến request và cân bằng tải. |
 | **User Service** | `8082` | Quản lý thông tin người dùng (Đăng ký, Đăng nhập). |
 | **Post Service** | `8083` | Quản lý bài đăng và nội dung. |
+| **Notification Service** | `8083` | Quản lý thông báo realtime. |
+
 
 ---
 
