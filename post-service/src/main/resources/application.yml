@@ -5,9 +5,9 @@ spring:
   application:
     name: post-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/social_post_db
-    username: postgres
-    password: 281100
+    url: ${POST_DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
