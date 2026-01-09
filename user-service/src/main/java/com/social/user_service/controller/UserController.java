@@ -5,6 +5,7 @@ import com.social.user_service.dto.UserUpdateRequest;
 import com.social.user_service.entity.AppUser;
 import com.social.user_service.repository.AppUserRepository;
 import com.social.user_service.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -95,7 +96,7 @@ public class UserController {
 
     @PutMapping("/me")
     public ResponseEntity<UserResponse> updateProfile(
-            @RequestBody UserUpdateRequest request,
+            @Valid @RequestBody UserUpdateRequest request,
             @AuthenticationPrincipal Jwt jwt) {
 
         String username = jwt.getClaimAsString("preferred_username");
