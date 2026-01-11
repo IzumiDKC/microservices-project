@@ -4,6 +4,8 @@
     <file url="file://$PROJECT_DIR$/api-gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/discovery-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/game-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/game-service/src/main/java/com/social/game_service/.env" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notification-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/post-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
