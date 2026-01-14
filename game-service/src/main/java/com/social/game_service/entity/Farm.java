@@ -24,7 +24,7 @@ public class Farm {
 
     private int level = 1;
     private long gold = 500; // Vàng khởi điểm
-    private int exp = 0;     // EXP hiện tại
+    private long exp = 0;     // EXP hiện tại
 
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
