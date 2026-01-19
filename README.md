@@ -13,6 +13,8 @@ Hệ thống bao gồm 4 dịch vụ chính hoạt động độc lập và liê
 | **User Service** | `8082` | Quản lý thông tin người dùng (Đăng ký, Đăng nhập). |
 | **Post Service** | `8083` | Quản lý bài đăng và nội dung. |
 | **Notification Service** | `8084` | Quản lý thông báo realtime. |
+| **Game Service** | `8085` | Quản lý game. |
+
 
 
 ---
